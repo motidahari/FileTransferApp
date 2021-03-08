@@ -14,9 +14,9 @@ public class runApp implements Runnable {
     private String strOneDrive;
     private String strGoogleDrive;
     private File file;
-
     private HashMap<String, Folder> FilesBylecturerInGoogleDrive = new HashMap<String, Folder>();
     private HashMap<String, Folder> FilesBylecturerInOneDrive = new HashMap<String, Folder>();
+
 
     public void run() {
         //start of the folder on your pc
@@ -61,6 +61,8 @@ public class runApp implements Runnable {
         long endTime = System.currentTimeMillis();
         System.out.println("Execution time in milliseconds: " + (endTime - startTime));
     }
+
+
 
     public static boolean createNewFile(HashMap<String, Folder> list, String path, String nameFile, int flag) {
         int count = 1;
@@ -126,7 +128,6 @@ public class runApp implements Runnable {
             }
         }
     }
-
     public static boolean createNewFile2(HashMap<String, Folder> list, String path, String[] nameFiles, int[] flag) {
 
         try {
@@ -162,9 +163,6 @@ public class runApp implements Runnable {
             return false;
         }
     }
-
-
-
     private static String getAllFiles(Collection<Files> files) {
         String str = "";
         for (Files file : files) {
@@ -172,7 +170,6 @@ public class runApp implements Runnable {
         }
         return str + "\n";
     }
-
     private static String getBigFilesInFolder(Collection<Files> files) {
         String str = "";
         for (Files file : files) {
@@ -190,8 +187,6 @@ public class runApp implements Runnable {
         }
         return str;
     }
-
-
     private static String getDetailsByFilesInFolder(Collection<Files> files) {
         String str = "";
         for (Files file : files) {
@@ -210,7 +205,6 @@ public class runApp implements Runnable {
         }
         return str;
     }
-
     private static String getPathByFolder(Folder f, int rowNum) {
         String[] arrP = (f.getPathOneDrive() + f.getPath()).split("\\\\");
         String str = rowNum + ". ";
@@ -225,8 +219,6 @@ public class runApp implements Runnable {
 
         return str;
     }
-
-
     /**
      * move file from google drive to one drive
      *
@@ -242,14 +234,13 @@ public class runApp implements Runnable {
         if (file.renameTo(new File(newLocation + "\\" + nameFile))) {
             // if file copied successfully then delete the original file
             file.delete();
-            System.out.println("File moved successfully\n Name: " + nameFile + "\n" + newLocation + "\\" + nameFile);
+            System.out.println("File moved successfully\nName: " + nameFile + "\n" + newLocation + "\\" + nameFile + "\n");
             return true;
         } else {
-            System.out.println("Failed to move the file to" + newLocation);
+            System.out.println("Failed to move the file to" + newLocation + "\n");
         }
         return false;
     }
-
     /**
      * check if there file with the same name in the one drive/
      * if exist create new name for the fole and change it in the object of the file.
@@ -265,8 +256,6 @@ public class runApp implements Runnable {
 //        file.setName("New" + file.getName());
         return changeNameFile(folder, file, OneDrive);
     }
-
-
     /**
      * read String From File And Add It To Array
      *

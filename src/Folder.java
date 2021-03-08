@@ -1,14 +1,60 @@
 import java.io.File;
 import java.util.*;
 
+class MyComp implements Comparator<Files> {
 
+
+    /**
+     * Compares its two arguments for order.  Returns a negative integer,
+     * zero, or a positive integer as the first argument is less than, equal
+     * to, or greater than the second.<p>
+     * <p>
+     * The implementor must ensure that {@code sgn(compare(x, y)) ==
+     * -sgn(compare(y, x))} for all {@code x} and {@code y}.  (This
+     * implies that {@code compare(x, y)} must throw an exception if and only
+     * if {@code compare(y, x)} throws an exception.)<p>
+     * <p>
+     * The implementor must also ensure that the relation is transitive:
+     * {@code ((compare(x, y)>0) && (compare(y, z)>0))} implies
+     * {@code compare(x, z)>0}.<p>
+     * <p>
+     * Finally, the implementor must ensure that {@code compare(x, y)==0}
+     * implies that {@code sgn(compare(x, z))==sgn(compare(y, z))} for all
+     * {@code z}.<p>
+     * <p>
+     * It is generally the case, but <i>not</i> strictly required that
+     * {@code (compare(x, y)==0) == (x.equals(y))}.  Generally speaking,
+     * any comparator that violates this condition should clearly indicate
+     * this fact.  The recommended language is "Note: this comparator
+     * imposes orderings that are inconsistent with equals."<p>
+     * <p>
+     * In the foregoing description, the notation
+     * {@code sgn(}<i>expression</i>{@code )} designates the mathematical
+     * <i>signum</i> function, which is defined to return one of {@code -1},
+     * {@code 0}, or {@code 1} according to whether the value of
+     * <i>expression</i> is negative, zero, or positive, respectively.
+     *
+     * @param o1 the first object to be compared.
+     * @param o2 the second object to be compared.
+     * @return a negative integer, zero, or a positive integer as the
+     * first argument is less than, equal to, or greater than the
+     * second.
+     * @throws NullPointerException if an argument is null and this
+     *                              comparator does not permit null arguments
+     * @throws ClassCastException   if the arguments' types prevent them from
+     *                              being compared by this comparator.
+     */
+    @Override
+    public int compare(Files o1, Files o2) {
+        return 0;
+    }
+}
 class Folder {
     private boolean isEmpty, properLocation;
     private int numFiles;
     private String path,lecturerName,pathOneDrive,fullPath,pathGoogleDrive;
     double sizeFolder;
     private HashMap<String, Files> FilesBylecturer = new HashMap<String, Files>();
-
 
 
     public Folder(String path, String fullPath, String pathOneDrive, String pathGoogleDrive) {
@@ -21,6 +67,7 @@ class Folder {
         initSizeFolder(FilesBylecturer.values());
 
     }
+
     private String getLecturerName(String s) {
         String[] split = s.split("\\\\");
         return split[split.length-1];
@@ -34,7 +81,6 @@ class Folder {
         initSizeFolder(FilesBylecturer.values());
 
     }
-
     public Folder(String path, String pathOneDrive, String pathGoogleDrive, boolean isEmpty, boolean properLocation, int numFiles) {
         this.path = path;
         this.pathOneDrive = pathOneDrive;
@@ -43,7 +89,6 @@ class Folder {
         this.properLocation = properLocation;
         this.numFiles = numFiles;
     }
-
     public Folder(Folder f) {
         this.path = f.path;
         this.pathOneDrive = f.pathOneDrive;
@@ -54,6 +99,8 @@ class Folder {
     }
 
 
+
+
     private void initSizeFolder(Collection<Files> files) {
         String str = "";
         double result = 0;
@@ -62,7 +109,6 @@ class Folder {
         }
         sizeFolder = result;
     }
-
     private double getSizeFolder(Collection<Files> files) {
         return (double)((int)(sizeFolder*100))/100;
     }
@@ -76,19 +122,19 @@ class Folder {
      * @params: path - the path of the Folder
      * @return: -1 -> if is not Directory, 1 if is Directory and the size big then zero -> ,if is Directory and the size is zero
      */
-
-
     public int checkIfFolderIsEmpty(String path) {
         File file = new File(path);
         if (file.isDirectory()) {
             if ((this.numFiles = file.list().length) > 0) {
                 if (this.numFiles == 1 && !file.listFiles()[0].getName().equals("desktop.ini")) {
                     getDetailsByFiles(file, FilesBylecturer);
+//                    getDetailsByFiles2(file, FilesBylecturer);
                     this.isEmpty = false;
                     this.properLocation = true;
                     return 1;
                 } else if (this.numFiles > 1) {
                     getDetailsByFiles(file, FilesBylecturer);
+//                    getDetailsByFiles2(file, FilesBylecturer);
                     this.isEmpty = false;
                     this.properLocation = true;
                     return 1;
@@ -112,6 +158,42 @@ class Folder {
             return -1;
         }
     }
+
+    public List<String> getDetailsByFiles2(File path, HashMap<String, Files> list) {
+        File[] listOfFiles = path.listFiles();
+        if (listOfFiles.length <= 0) return null;
+        ArrayList<String> sortedKeys = new ArrayList<>();
+        sortedKeys.add(listOfFiles[0].getName()); // add first element
+
+        int curr = 0;
+        int res;
+        for (File s: listOfFiles) {
+            res = s.getName().compareToIgnoreCase(sortedKeys.get(curr));
+            if (!list.containsKey(s)) {
+                if (res == 0) {// If equals ignore-case
+                    sortedKeys.add(++curr, s.getName());
+                }
+                else if(res < 0) {// If s comes before the other
+                    String tmp = sortedKeys.get(curr);
+                    sortedKeys.add(curr++, s.getName()); // Because s precedes the other string
+                    sortedKeys.add(curr++, tmp);
+                } else {// If the other comes before s
+                    sortedKeys.add(++curr, s.getName()); // Because s precedes the other string
+                }
+            }
+        }
+//        for (String s : sortedKeys) {
+//            if (f.isFile() && !f.getName().equals("desktop.ini")) {
+//                list.putIfAbsent(f.getName(),new Files(path.getPath() , f.getName()));
+//            } else if (f.isDirectory()) {
+//                list.putIfAbsent(f.getName(),new Files(path.getPath() , f.getName()));
+//            }
+//        }
+        return sortedKeys;
+
+    }
+
+
     public void getDetailsByFiles(File path, HashMap<String, Files> list) {
         File[] listOfFiles = path.listFiles();
         this.numFiles = listOfFiles.length;
@@ -122,11 +204,6 @@ class Folder {
                     list.putIfAbsent(f.getName(),new Files(path.getPath() , f.getName()));
                 }
             }
-
-
-
-//        Collections.sort((List)list);
-//
     }
     public void getDetailsByFiles(File path, Queue<Files> list) {
         File[] listOfFiles = path.listFiles();
@@ -145,8 +222,6 @@ class Folder {
             this.FilesBylecturer.putIfAbsent(f.getName(), new Files(path.getPath(), f.getName()));
         }
     }
-
-
     private String getAllFiles(HashMap<String, Files> list) {
         String str = "";
         for (Files f : list.values()) {
@@ -154,6 +229,13 @@ class Folder {
         }
         return str;
     }
+
+
+
+
+
+
+
 
     /**
      * Comparator - return 1 if the string of o1 big then string of o2,
@@ -202,6 +284,10 @@ class Folder {
         }
 
     }
+
+
+
+
     /**
      * Comparator - return 1 if the string of o1 big then string of o2,
      * return 1 if the string of o1 small then string of o2
@@ -242,74 +328,69 @@ class Folder {
             }
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
     public boolean isEmpty() {
         return isEmpty;
     }
-
     public boolean contains(String fileName) {
         return FilesBylecturer.containsKey(fileName);
     }
-
     public void setEmpty(boolean empty) {
         isEmpty = empty;
     }
-
     public boolean isProperLocation() {
         return properLocation;
     }
-
     public void setProperLocation(boolean properLocation) {
         this.properLocation = properLocation;
     }
-
     public int getNumFiles() {
         return numFiles;
     }
-
     public void setNumFiles(int numFiles) {
         this.numFiles = numFiles;
     }
-
     public String getPath() {
         return path;
     }
-
     public void setPath(String path) {
         this.path = path;
     }
-
     public String getPathOneDrive() {
         return pathOneDrive;
     }
-
     public void setPathOneDrive(String pathOneDrive) {
         this.pathOneDrive = pathOneDrive;
     }
-
     public String getPathGoogleDrive() {
         return pathGoogleDrive;
     }
-
     public void setPathGoogleDrive(String pathGoogleDrive) {
         this.pathGoogleDrive = pathGoogleDrive;
     }
-
     public double getSizeFolder() {
         return sizeFolder;
     }
-
     public void setSizeFolder(long sizeFolder) {
         this.sizeFolder = sizeFolder;
     }
-
     public HashMap<String, Files> getFilesBylecturer() {
         return FilesBylecturer;
     }
-
     public void setFilesBylecturer(HashMap<String, Files> filesBylecturer) {
         FilesBylecturer = filesBylecturer;
     }
-
     @Override
     public String toString() {
         return "folder{" +
