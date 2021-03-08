@@ -7,18 +7,17 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 public class runApp implements Runnable {
-    private String pathforApp;
+
+    private String pathforApp,path,pathforYoutube,strOneDrive,strGoogleDrive,LOG_ERROR = "",SUCCEEDED = "";
     private Config con;
-    private String path;
-    private String pathforYoutube;
-    private String strOneDrive;
-    private String strGoogleDrive;
     private File file;
     private HashMap<String, Folder> FilesBylecturerInGoogleDrive = new HashMap<String, Folder>();
     private HashMap<String, Folder> FilesBylecturerInOneDrive = new HashMap<String, Folder>();
 
 
     public void run() {
+
+
         //start of the folder on your pc
         con = new Config();
         //the path of the Folder from text file
@@ -55,16 +54,16 @@ public class runApp implements Runnable {
                 }
             }
         }
-        int[] flags = {0, 1, 2, 3};
-        String[] flagsS = {"allFiles.txt", "emptyFolders.txt", "AllFilesWithAllDetails.txt", "bigFiles.txt"};
-        boolean exportResult = createNewFile2(FilesBylecturerInOneDrive, pathforApp, flagsS, flags);
+        int[] flags = {0, 1, 2, 3, 4, 5};
+        String[] flagsS = {"allFiles.txt", "emptyFolders.txt", "AllFilesWithAllDetails.txt", "bigFiles.txt","LOG_FILE.txt", "SUCCEEDED.txt"};
+        boolean exportResult = createNewFile(FilesBylecturerInOneDrive, pathforApp, flagsS, flags);
         long endTime = System.currentTimeMillis();
         System.out.println("Execution time in milliseconds: " + (endTime - startTime));
     }
 
 
 
-    public static boolean createNewFile(HashMap<String, Folder> list, String path, String nameFile, int flag) {
+    public boolean createNewFile2(HashMap<String, Folder> list, String path, String nameFile, int flag) {
         int count = 1;
         if (flag == 1) {
             try {
@@ -128,10 +127,12 @@ public class runApp implements Runnable {
             }
         }
     }
-    public static boolean createNewFile2(HashMap<String, Folder> list, String path, String[] nameFiles, int[] flag) {
-
+    public boolean createNewFile(HashMap<String, Folder> list, String path, String[] nameFiles, int[] flag) {
+        int err = 0;
+        String LOG = "";
         try {
             for (int i = 0; i < flag.length; i++) {
+                err = i;
                 int count = 1;
                 FileWriter myWriter = new FileWriter(path + "\\" + nameFiles[i]);
                 String str = "";
@@ -148,29 +149,35 @@ public class runApp implements Runnable {
                         str += getPathByFolder(f, count) + "\n";
                         str += getBigFilesInFolder(f.getFilesBylecturer().values()) + "\n";
                     }
+//                    else if (flag[i] == 4) {
+//                        str += LOG_ERROR;
+//                    } else if (flag[i] == 5) {
+//                        str += SUCCEEDED;
+//                    }
                     count++;
 
                 }
-//                System.out.println(str);
                 myWriter.write(str + "\n");
-                System.out.println("Successfully wrote to the file :" + nameFiles[i]);
+                this.SUCCEEDED += "Successfully wrote to the file :" + nameFiles[i] + "\n";
+//                System.out.println("Successfully wrote to the file :" + nameFiles[i]);
                 myWriter.close();
             }
             return true;
         } catch (IOException e) {
-            System.out.println("An error occurred.");
+            this.LOG_ERROR += "An error occurred in file: " + nameFiles[err] + "\n";
+//            System.out.println("An error occurred.");
             e.printStackTrace();
             return false;
         }
     }
-    private static String getAllFiles(Collection<Files> files) {
+    private String getAllFiles(Collection<Files> files) {
         String str = "";
         for (Files file : files) {
             str += "\t" + file.getName() + "\n";
         }
         return str + "\n";
     }
-    private static String getBigFilesInFolder(Collection<Files> files) {
+    private String getBigFilesInFolder(Collection<Files> files) {
         String str = "";
         for (Files file : files) {
             if (file.getMegabytes() > 500) {
@@ -187,7 +194,7 @@ public class runApp implements Runnable {
         }
         return str;
     }
-    private static String getDetailsByFilesInFolder(Collection<Files> files) {
+    private String getDetailsByFilesInFolder(Collection<Files> files) {
         String str = "";
         for (Files file : files) {
             str += "\tFiles:{" +
@@ -205,7 +212,7 @@ public class runApp implements Runnable {
         }
         return str;
     }
-    private static String getPathByFolder(Folder f, int rowNum) {
+    private String getPathByFolder(Folder f, int rowNum) {
         String[] arrP = (f.getPathOneDrive() + f.getPath()).split("\\\\");
         String str = rowNum + ". ";
         for (int j = 3; j < arrP.length - 1; j++) {
@@ -235,9 +242,11 @@ public class runApp implements Runnable {
             // if file copied successfully then delete the original file
             file.delete();
             System.out.println("File moved successfully\nName: " + nameFile + "\n" + newLocation + "\\" + nameFile + "\n");
+            this.SUCCEEDED += "File moved successfully\nName: " + nameFile + "\n" + newLocation + "\\" + nameFile + "\n";
             return true;
         } else {
             System.out.println("Failed to move the file to" + newLocation + "\n");
+            this.LOG_ERROR += "Failed to move the file to" + newLocation + "\n";
         }
         return false;
     }
@@ -268,15 +277,14 @@ public class runApp implements Runnable {
             Scanner scanner = new Scanner(file, "UTF-8");
             while (scanner.hasNextLine()) {
                 String data = scanner.nextLine();
-//                System.out.println(data);
                 if (data.length() >= 2 && !(data.substring(0, 2).equals("/*"))) {
-//                    System.out.println(data);
                     FilesBylecturerInGoogleDrive.putIfAbsent(data, new Folder(data, strGoogleDrive + data, strOneDrive, strGoogleDrive));
                     FilesBylecturerInOneDrive.putIfAbsent(data, new Folder(data, strOneDrive + data, strOneDrive, strGoogleDrive));
                 }
             }
             scanner.close();
         } catch (FileNotFoundException e) {
+            this.LOG_ERROR += "An error occurred in func readStringFromFileAndAddItToArray\n";
             System.out.println("An error occurred in func readStringFromFileAndAddItToArray.");
             e.printStackTrace();
         }

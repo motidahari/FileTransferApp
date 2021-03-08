@@ -128,13 +128,11 @@ class Folder {
             if ((this.numFiles = file.list().length) > 0) {
                 if (this.numFiles == 1 && !file.listFiles()[0].getName().equals("desktop.ini")) {
                     getDetailsByFiles(file, FilesBylecturer);
-//                    getDetailsByFiles2(file, FilesBylecturer);
                     this.isEmpty = false;
                     this.properLocation = true;
                     return 1;
                 } else if (this.numFiles > 1) {
                     getDetailsByFiles(file, FilesBylecturer);
-//                    getDetailsByFiles2(file, FilesBylecturer);
                     this.isEmpty = false;
                     this.properLocation = true;
                     return 1;
@@ -182,15 +180,7 @@ class Folder {
                 }
             }
         }
-//        for (String s : sortedKeys) {
-//            if (f.isFile() && !f.getName().equals("desktop.ini")) {
-//                list.putIfAbsent(f.getName(),new Files(path.getPath() , f.getName()));
-//            } else if (f.isDirectory()) {
-//                list.putIfAbsent(f.getName(),new Files(path.getPath() , f.getName()));
-//            }
-//        }
         return sortedKeys;
-
     }
 
 
@@ -200,7 +190,7 @@ class Folder {
             for (File f : path.listFiles()) {
                 if (f.isFile() && !f.getName().equals("desktop.ini")) {
                     list.putIfAbsent(f.getName(),new Files(path.getPath() , f.getName()));
-                } else if (f.isDirectory()) {
+                }else if (f.isDirectory()) {
                     list.putIfAbsent(f.getName(),new Files(path.getPath() , f.getName()));
                 }
             }
@@ -208,9 +198,7 @@ class Folder {
     public void getDetailsByFiles(File path, Queue<Files> list) {
         File[] listOfFiles = path.listFiles();
         this.numFiles = listOfFiles.length;
-
         Queue<Files> q = new PriorityQueue<Files>(new compFiles());
-
         for (File f : path.listFiles()) {
             if ((f.isFile() || f.isDirectory()) && !f.getName().equals("desktop.ini")) {
                 q.add(new Files(path.getPath(), f.getName()));
@@ -229,14 +217,6 @@ class Folder {
         }
         return str;
     }
-
-
-
-
-
-
-
-
     /**
      * Comparator - return 1 if the string of o1 big then string of o2,
      * return 1 if the string of o1 small then string of o2
@@ -284,10 +264,6 @@ class Folder {
         }
 
     }
-
-
-
-
     /**
      * Comparator - return 1 if the string of o1 big then string of o2,
      * return 1 if the string of o1 small then string of o2
@@ -328,18 +304,6 @@ class Folder {
             }
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
     public boolean isEmpty() {
         return isEmpty;
     }
