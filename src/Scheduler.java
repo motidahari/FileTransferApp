@@ -8,9 +8,9 @@ public class Scheduler {
         ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
 //        OldRun folders = new OldRun();
 //        folders.run();
+//		  runApp.run();
         runApp runApp = new runApp();
-		runApp.run();
-//        scheduledExecutorService.scheduleAtFixedRate(runApp, 0, 1, TimeUnit.HOURS);
+        scheduledExecutorService.scheduleAtFixedRate(runApp, 0, 1, TimeUnit.HOURS);
     }
 
 }
